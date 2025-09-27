@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ForexPair } from "@/hooks/useForexData";
 import { useToast } from "@/hooks/use-toast";
+import { TrendIndicator } from "./TrendIndicator";
 
 interface WatchlistProps {
   allPairs: ForexPair[];
@@ -145,6 +146,9 @@ export const Watchlist = ({ allPairs }: WatchlistProps) => {
                       <div className="text-sm text-muted-foreground">
                         H: {item.high} L: {item.low}
                       </div>
+                      <div className="text-xs text-muted-foreground">
+                        Vol: {item.volume.toLocaleString()}
+                      </div>
                     </div>
                   </div>
                   
@@ -152,19 +156,11 @@ export const Watchlist = ({ allPairs }: WatchlistProps) => {
                     <div className="font-mono text-lg">
                       {item.price.toFixed(4)}
                     </div>
-                    <div className="flex items-center space-x-1">
-                      {isPositive ? (
-                        <TrendingUp className="h-3 w-3 text-bull" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 text-bear" />
-                      )}
-                      <Badge 
-                        variant={isPositive ? "default" : "destructive"}
-                        className={isPositive ? "bg-bull hover:bg-bull/80" : ""}
-                      >
-                        {isPositive ? '+' : ''}{item.changePercent.toFixed(2)}%
-                      </Badge>
-                    </div>
+                    <TrendIndicator 
+                      trend={item.trend} 
+                      changePercent={item.changePercent}
+                      size="sm"
+                    />
                   </div>
                 </div>
               );
@@ -177,8 +173,19 @@ export const Watchlist = ({ allPairs }: WatchlistProps) => {
             <h4 className="text-sm font-medium mb-3">All Currency Pairs</h4>
             <div className="grid gap-2">
               {allPairs.map((pair) => (
-                <div key={pair.pair} className="flex items-center justify-between py-1">
-                  <span className="text-sm">{pair.pair}</span>
+                <div key={pair.pair} className="flex items-center justify-between py-2 px-2 rounded hover:bg-muted/30">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm font-medium">{pair.pair}</span>
+                    <TrendIndicator 
+                      trend={pair.trend} 
+                      changePercent={pair.changePercent}
+                      size="sm"
+                      showText={false}
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {pair.price}
+                    </span>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"

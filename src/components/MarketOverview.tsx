@@ -1,7 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TrendingUp } from "lucide-react";
 import { ForexPair } from "@/hooks/useForexData";
+import { TrendIndicator } from "./TrendIndicator";
 
 interface MarketOverviewProps {
   data: ForexPair[];
@@ -9,6 +12,41 @@ interface MarketOverviewProps {
 }
 
 export const MarketOverview = ({ data, onPairSelect }: MarketOverviewProps) => {
+  const forexPairs = data.filter(pair => pair.category === 'forex');
+  const metalsPairs = data.filter(pair => pair.category === 'metals');
+  const cryptoPairs = data.filter(pair => pair.category === 'crypto');
+
+  const PairList = ({ pairs }: { pairs: ForexPair[] }) => (
+    <div className="space-y-3">
+      {pairs.map((pair) => (
+        <div 
+          key={pair.pair} 
+          className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
+          onClick={() => onPairSelect?.(pair.pair)}
+        >
+          <div>
+            <div className="font-medium">{pair.pair}</div>
+            <div className="text-sm text-muted-foreground">
+              H: {pair.high} L: {pair.low}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Vol: {pair.volume.toLocaleString()}
+            </div>
+          </div>
+          
+          <div className="text-right space-y-1">
+            <div className="font-mono">{pair.price}</div>
+            <TrendIndicator 
+              trend={pair.trend} 
+              changePercent={pair.changePercent}
+              size="sm"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -18,45 +56,33 @@ export const MarketOverview = ({ data, onPairSelect }: MarketOverviewProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4">
-          {data.map((item) => {
-            const isPositive = item.change >= 0;
-            
-            return (
-              <div
-                key={item.pair}
-                className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors"
-                onClick={() => onPairSelect?.(item.pair)}
-              >
-                <div>
-                  <div className="font-medium">{item.pair}</div>
-                  <div className="text-sm text-muted-foreground">
-                    H: {item.high} L: {item.low}
-                  </div>
-                </div>
-                
-                <div className="text-right">
-                  <div className="font-mono text-lg">
-                    {item.price.toFixed(4)}
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    {isPositive ? (
-                      <TrendingUp className="h-3 w-3 text-bull" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3 text-bear" />
-                    )}
-                    <Badge 
-                      variant={isPositive ? "default" : "destructive"}
-                      className={isPositive ? "bg-bull hover:bg-bull/80" : ""}
-                    >
-                      {isPositive ? '+' : ''}{item.changePercent.toFixed(2)}%
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <Tabs defaultValue="forex" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="forex">Forex</TabsTrigger>
+            <TabsTrigger value="metals">Metals</TabsTrigger>
+            <TabsTrigger value="crypto">Crypto</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="forex" className="mt-4">
+            <PairList pairs={forexPairs.slice(0, 6)} />
+          </TabsContent>
+          
+          <TabsContent value="metals" className="mt-4">
+            <PairList pairs={metalsPairs} />
+          </TabsContent>
+          
+          <TabsContent value="crypto" className="mt-4">
+            <PairList pairs={cryptoPairs} />
+          </TabsContent>
+        </Tabs>
+        
+        <Button 
+          variant="outline" 
+          className="w-full mt-4"
+          onClick={() => console.log("Show more pairs")}
+        >
+          View All Markets
+        </Button>
       </CardContent>
     </Card>
   );

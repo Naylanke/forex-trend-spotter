@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Header } from "./Header";
+import { Settings } from "./Settings";
 import { MarketOverview } from "./MarketOverview";
 import { ForexChart } from "./ForexChart";
 import { Watchlist } from "./Watchlist";
@@ -9,11 +10,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Dashboard = () => {
   const { data: forexData, historicalData, loading } = useForexData();
   const [selectedPair, setSelectedPair] = useState("EUR/USD");
+  const [currentPage, setCurrentPage] = useState("dashboard");
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <Header onNavigate={setCurrentPage} />
         <div className="container mx-auto p-6 space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -32,9 +34,18 @@ export const Dashboard = () => {
     );
   }
 
+  if (currentPage === "settings") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header onNavigate={setCurrentPage} />
+        <Settings />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onNavigate={setCurrentPage} />
       
       <main className="container mx-auto p-6 space-y-6">
         {/* Welcome Section */}

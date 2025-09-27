@@ -8,6 +8,9 @@ export interface ForexPair {
   high: number;
   low: number;
   timestamp: number;
+  trend: 'up' | 'down' | 'sideways';
+  volume: number;
+  category: 'forex' | 'metals' | 'crypto';
 }
 
 export interface HistoricalData {
@@ -21,29 +24,45 @@ export interface HistoricalData {
 // Mock forex data for demonstration - in production, use a real forex API
 const generateMockData = (): ForexPair[] => {
   const pairs = [
-    { pair: 'EUR/USD', basePrice: 1.0850 },
-    { pair: 'GBP/USD', basePrice: 1.2640 },
-    { pair: 'USD/JPY', basePrice: 149.50 },
-    { pair: 'AUD/USD', basePrice: 0.6580 },
-    { pair: 'USD/CAD', basePrice: 1.3450 },
-    { pair: 'USD/CHF', basePrice: 0.8950 },
-    { pair: 'NZD/USD', basePrice: 0.5980 },
-    { pair: 'EUR/GBP', basePrice: 0.8590 },
+    { pair: 'EUR/USD', basePrice: 1.0850, category: 'forex' as const },
+    { pair: 'GBP/USD', basePrice: 1.2640, category: 'forex' as const },
+    { pair: 'USD/JPY', basePrice: 149.50, category: 'forex' as const },
+    { pair: 'AUD/USD', basePrice: 0.6580, category: 'forex' as const },
+    { pair: 'USD/CAD', basePrice: 1.3450, category: 'forex' as const },
+    { pair: 'USD/CHF', basePrice: 0.8950, category: 'forex' as const },
+    { pair: 'NZD/USD', basePrice: 0.5980, category: 'forex' as const },
+    { pair: 'EUR/GBP', basePrice: 0.8590, category: 'forex' as const },
+    { pair: 'XAU/USD', basePrice: 2032.50, category: 'metals' as const },
+    { pair: 'XAG/USD', basePrice: 24.85, category: 'metals' as const },
+    { pair: 'BTC/USD', basePrice: 43250.00, category: 'crypto' as const },
+    { pair: 'ETH/USD', basePrice: 2645.00, category: 'crypto' as const },
   ];
 
-  return pairs.map(({ pair, basePrice }) => {
-    const change = (Math.random() - 0.5) * 0.01;
+  return pairs.map(({ pair, basePrice, category }) => {
+    const changeMultiplier = category === 'crypto' ? 0.05 : category === 'metals' ? 0.02 : 0.01;
+    const change = (Math.random() - 0.5) * changeMultiplier;
     const price = basePrice + change;
     const changePercent = (change / basePrice) * 100;
     
+    // Determine trend based on change
+    let trend: 'up' | 'down' | 'sideways' = 'sideways';
+    if (Math.abs(changePercent) > 0.1) {
+      trend = changePercent > 0 ? 'up' : 'down';
+    }
+    
+    const decimals = category === 'crypto' ? 2 : category === 'metals' ? 2 : 4;
+    
     return {
       pair,
-      price: Number(price.toFixed(4)),
-      change: Number(change.toFixed(4)),
+      price: Number(price.toFixed(decimals)),
+      change: Number(change.toFixed(decimals)),
       changePercent: Number(changePercent.toFixed(2)),
-      high: Number((price + Math.random() * 0.005).toFixed(4)),
-      low: Number((price - Math.random() * 0.005).toFixed(4)),
+      high: Number((price + Math.random() * 0.005).toFixed(decimals)),
+      low: Number((price - Math.random() * 0.005).toFixed(decimals)),
       timestamp: Date.now(),
+      trend,
+      volume: Math.floor(Math.random() * 1000000) + 100000,
+      category,
     };
   });
 };
