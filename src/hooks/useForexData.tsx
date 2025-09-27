@@ -105,10 +105,10 @@ export const useForexData = () => {
     setHistoricalData(generateHistoricalData());
     setLoading(false);
 
-    // Update data every 5 seconds to simulate real-time updates
+    // Update data every 1 second for live MT5-style market updates
     const interval = setInterval(() => {
       setData(generateMockData());
-    }, 5000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);

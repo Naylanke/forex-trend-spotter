@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { Moon, Sun, TrendingUp, User, LogOut, Settings } from "lucide-react";
+import { Moon, Sun, TrendingUp, User, LogOut, Settings, Download } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "./NotificationCenter";
 import {
@@ -32,12 +32,20 @@ export const Header = ({ onNavigate }: HeaderProps) => {
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex items-center space-x-2">
           <TrendingUp className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl">ForexPro</span>
+          <span className="font-bold text-xl cursor-pointer" onClick={() => handleNavigation('dashboard')}>ForexPro</span>
         </div>
         
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
-            {/* Search or additional navigation can go here */}
+            <nav className="hidden md:flex items-center space-x-6">
+              <Button variant="ghost" onClick={() => handleNavigation('dashboard')}>
+                Dashboard
+              </Button>
+              <Button variant="ghost" onClick={() => handleNavigation('download')}>
+                <Download className="mr-2 h-4 w-4" />
+                Download App
+              </Button>
+            </nav>
           </div>
           
           <nav className="flex items-center space-x-2">

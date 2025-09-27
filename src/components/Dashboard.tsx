@@ -12,6 +12,14 @@ export const Dashboard = () => {
   const [selectedPair, setSelectedPair] = useState("EUR/USD");
   const [currentPage, setCurrentPage] = useState("dashboard");
 
+  const handleNavigation = (page: string) => {
+    if (page === 'download') {
+      window.location.href = '/download';
+    } else {
+      setCurrentPage(page);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -45,7 +53,7 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onNavigate={setCurrentPage} />
+      <Header onNavigate={handleNavigation} />
       
       <main className="container mx-auto p-6 space-y-6">
         {/* Welcome Section */}
