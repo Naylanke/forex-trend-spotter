@@ -1,15 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { Moon, Sun, TrendingUp, User, LogOut, Settings, Download } from "lucide-react";
+import { Moon, Sun, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "./NotificationCenter";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+import { AppDrawer } from "./AppDrawer";
 
 interface HeaderProps {
   onNavigate?: (page: string) => void;
@@ -18,10 +12,6 @@ interface HeaderProps {
 export const Header = ({ onNavigate }: HeaderProps) => {
   const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
 
   const handleNavigation = (page: string) => {
     onNavigate?.(page);
@@ -41,10 +31,6 @@ export const Header = ({ onNavigate }: HeaderProps) => {
               <Button variant="ghost" onClick={() => handleNavigation('dashboard')}>
                 Dashboard
               </Button>
-              <Button variant="ghost" onClick={() => handleNavigation('download')}>
-                <Download className="mr-2 h-4 w-4" />
-                Download App
-              </Button>
             </nav>
           </div>
           
@@ -59,30 +45,8 @@ export const Header = ({ onNavigate }: HeaderProps) => {
               <span className="sr-only">Toggle theme</span>
             </Button>
             
-            {user && (
-              <>
-                <NotificationCenter />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <User className="h-4 w-4" />
-                      <span className="sr-only">User menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleNavigation('settings')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
+            {user && <NotificationCenter />}
+            <AppDrawer onNavigate={handleNavigation} />
           </nav>
         </div>
       </div>

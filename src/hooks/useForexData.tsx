@@ -67,25 +67,42 @@ const generateMockData = (): ForexPair[] => {
   });
 };
 
-const generateHistoricalData = (days: number = 30): HistoricalData[] => {
+const generateHistoricalData = (pair: string = "EUR/USD", days: number = 30): HistoricalData[] => {
   const data: HistoricalData[] = [];
-  const basePrice = 1.0850;
-  let currentPrice = basePrice;
+  
+  // Get base price for the selected pair
+  const pairConfigs: Record<string, { basePrice: number; volatility: number; decimals: number }> = {
+    'EUR/USD': { basePrice: 1.0850, volatility: 0.01, decimals: 4 },
+    'GBP/USD': { basePrice: 1.2640, volatility: 0.012, decimals: 4 },
+    'USD/JPY': { basePrice: 149.50, volatility: 0.8, decimals: 2 },
+    'AUD/USD': { basePrice: 0.6580, volatility: 0.011, decimals: 4 },
+    'USD/CAD': { basePrice: 1.3450, volatility: 0.009, decimals: 4 },
+    'USD/CHF': { basePrice: 0.8950, volatility: 0.008, decimals: 4 },
+    'NZD/USD': { basePrice: 0.5980, volatility: 0.013, decimals: 4 },
+    'EUR/GBP': { basePrice: 0.8590, volatility: 0.007, decimals: 4 },
+    'XAU/USD': { basePrice: 2032.50, volatility: 15.0, decimals: 2 },
+    'XAG/USD': { basePrice: 24.85, volatility: 0.8, decimals: 2 },
+    'BTC/USD': { basePrice: 43250.00, volatility: 1200.0, decimals: 2 },
+    'ETH/USD': { basePrice: 2645.00, volatility: 85.0, decimals: 2 },
+  };
+  
+  const config = pairConfigs[pair] || pairConfigs['EUR/USD'];
+  let currentPrice = config.basePrice;
   
   for (let i = days; i >= 0; i--) {
     const timestamp = Date.now() - (i * 24 * 60 * 60 * 1000);
     const open = currentPrice;
-    const change = (Math.random() - 0.5) * 0.02;
+    const change = (Math.random() - 0.5) * config.volatility * 2;
     const close = open + change;
-    const high = Math.max(open, close) + Math.random() * 0.01;
-    const low = Math.min(open, close) - Math.random() * 0.01;
+    const high = Math.max(open, close) + Math.random() * config.volatility;
+    const low = Math.min(open, close) - Math.random() * config.volatility;
     
     data.push({
       timestamp,
-      open: Number(open.toFixed(4)),
-      high: Number(high.toFixed(4)),
-      low: Number(low.toFixed(4)),
-      close: Number(close.toFixed(4)),
+      open: Number(open.toFixed(config.decimals)),
+      high: Number(high.toFixed(config.decimals)),
+      low: Number(low.toFixed(config.decimals)),
+      close: Number(close.toFixed(config.decimals)),
     });
     
     currentPrice = close;
@@ -94,7 +111,7 @@ const generateHistoricalData = (days: number = 30): HistoricalData[] => {
   return data;
 };
 
-export const useForexData = () => {
+export const useForexData = (selectedPair?: string) => {
   const [data, setData] = useState<ForexPair[]>([]);
   const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,7 +119,7 @@ export const useForexData = () => {
   useEffect(() => {
     // Initial data load
     setData(generateMockData());
-    setHistoricalData(generateHistoricalData());
+    setHistoricalData(generateHistoricalData(selectedPair));
     setLoading(false);
 
     // Update data every 1 second for live MT5-style market updates
@@ -112,6 +129,13 @@ export const useForexData = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Update historical data when selected pair changes
+  useEffect(() => {
+    if (selectedPair) {
+      setHistoricalData(generateHistoricalData(selectedPair));
+    }
+  }, [selectedPair]);
 
   return { data, historicalData, loading };
 };

@@ -8,8 +8,8 @@ import { useForexData } from "@/hooks/useForexData";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Dashboard = () => {
-  const { data: forexData, historicalData, loading } = useForexData();
   const [selectedPair, setSelectedPair] = useState("EUR/USD");
+  const { data: forexData, historicalData, loading } = useForexData(selectedPair);
   const [currentPage, setCurrentPage] = useState("dashboard");
 
   const handleNavigation = (page: string) => {
