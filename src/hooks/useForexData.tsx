@@ -124,11 +124,34 @@ export const useForexData = (selectedPair?: string) => {
 
     // Update data every 1 second for live MT5-style market updates
     const interval = setInterval(() => {
-      setData(generateMockData());
+      const newData = generateMockData();
+      setData(newData);
+      
+      // Update historical data with live price - update the last candle
+      setHistoricalData(prevData => {
+        if (prevData.length === 0) return prevData;
+        
+        const pairData = newData.find(p => p.pair === selectedPair);
+        if (!pairData) return prevData;
+        
+        const updatedData = [...prevData];
+        const lastCandle = updatedData[updatedData.length - 1];
+        
+        // Update the last candle's close price and high/low
+        updatedData[updatedData.length - 1] = {
+          ...lastCandle,
+          close: pairData.price,
+          high: Math.max(lastCandle.high, pairData.price),
+          low: Math.min(lastCandle.low, pairData.price),
+          timestamp: Date.now()
+        };
+        
+        return updatedData;
+      });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [selectedPair]);
 
   // Update historical data when selected pair changes
   useEffect(() => {
