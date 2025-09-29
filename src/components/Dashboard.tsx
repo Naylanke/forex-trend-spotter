@@ -3,6 +3,7 @@ import { Header } from "./Header";
 import { Settings } from "./Settings";
 import { MarketOverview } from "./MarketOverview";
 import { ForexChart } from "./ForexChart";
+import { MarketFlowAnalyzer } from "./MarketFlowAnalyzer";
 import { Watchlist } from "./Watchlist";
 import { useForexData } from "@/hooks/useForexData";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -82,8 +83,15 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Watchlist and Additional Info */}
-        <div className="grid gap-6 md:grid-cols-2">
+        {/* Market Flow Analysis */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <MarketFlowAnalyzer 
+              data={historicalData}
+              pair={selectedPair}
+            />
+          </div>
+          
           <div>
             <Watchlist allPairs={forexData} />
           </div>

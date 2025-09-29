@@ -1,6 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { HistoricalData } from "@/hooks/useForexData";
+import { useState } from 'react';
 
 interface ForexChartProps {
   data: HistoricalData[];
@@ -8,12 +11,87 @@ interface ForexChartProps {
   pair?: string;
 }
 
+type TimePeriod = 'hour' | 'day' | 'month';
+
+// Market flow detection algorithm
+const detectMarketFlow = (data: HistoricalData[]) => {
+  if (data.length < 3) return { signal: 'HOLD', strength: 0 };
+  
+  const recent = data.slice(-5); // Last 5 data points
+  const prices = recent.map(d => d.close);
+  
+  // Calculate moving average
+  const ma = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+  const currentPrice = prices[prices.length - 1];
+  
+  // Calculate price momentum
+  const momentum = (currentPrice - prices[0]) / prices[0];
+  
+  // Calculate volatility
+  const volatility = Math.sqrt(
+    prices.reduce((sum, price) => sum + Math.pow(price - ma, 2), 0) / prices.length
+  );
+  
+  // Simple RSI-like calculation
+  const gains = [];
+  const losses = [];
+  
+  for (let i = 1; i < prices.length; i++) {
+    const change = prices[i] - prices[i-1];
+    if (change > 0) gains.push(change);
+    else losses.push(Math.abs(change));
+  }
+  
+  const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / gains.length : 0;
+  const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / losses.length : 0;
+  const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+  const rsi = 100 - (100 / (1 + rs));
+  
+  // Determine signal
+  let signal: 'BUY' | 'SELL' | 'HOLD' = 'HOLD';
+  let strength = 0;
+  
+  if (momentum > 0.002 && rsi < 70 && currentPrice > ma) {
+    signal = 'BUY';
+    strength = Math.min(momentum * 1000, 1);
+  } else if (momentum < -0.002 && rsi > 30 && currentPrice < ma) {
+    signal = 'SELL';
+    strength = Math.min(Math.abs(momentum) * 1000, 1);
+  }
+  
+  return { signal, strength, rsi, momentum: momentum * 100 };
+};
+
 export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: ForexChartProps) => {
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('day');
+  
+  const formatTimeByPeriod = (timestamp: number, period: TimePeriod) => {
+    const date = new Date(timestamp);
+    switch (period) {
+      case 'hour':
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      case 'day':
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      case 'month':
+        return date.toLocaleDateString([], { year: 'numeric', month: 'short' });
+      default:
+        return date.toLocaleDateString();
+    }
+  };
+
   const chartData = data.map((item) => ({
-    time: new Date(item.timestamp).toLocaleDateString(),
+    time: formatTimeByPeriod(item.timestamp, timePeriod),
     price: item.close,
+    high: item.high,
+    low: item.low,
+    volume: Math.random() * 1000000, // Mock volume data
     fullDate: new Date(item.timestamp).toLocaleString(),
   }));
+
+  const marketFlow = detectMarketFlow(data);
+  const currentPrice = data[data.length - 1]?.close || 0;
+  const previousPrice = data[data.length - 2]?.close || 0;
+  const isPositive = currentPrice >= previousPrice;
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -27,24 +105,74 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
     return null;
   };
 
-  const currentPrice = data[data.length - 1]?.close || 0;
-  const previousPrice = data[data.length - 2]?.close || 0;
-  const isPositive = currentPrice >= previousPrice;
+  const getSignalColor = (signal: string) => {
+    switch (signal) {
+      case 'BUY': return 'bg-bull text-bull-foreground';
+      case 'SELL': return 'bg-bear text-bear-foreground';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{title}</span>
-          <span className={`text-sm font-mono ${isPositive ? 'text-bull' : 'text-bear'}`}>
-            {currentPrice.toFixed(4)} {isPositive ? '↑' : '↓'}
-          </span>
+          <div className="flex items-center gap-2">
+            <Badge className={getSignalColor(marketFlow.signal)}>
+              {marketFlow.signal} {marketFlow.strength > 0 && `(${(marketFlow.strength * 100).toFixed(0)}%)`}
+            </Badge>
+            <span className={`text-sm font-mono ${isPositive ? 'text-bull' : 'text-bear'}`}>
+              {currentPrice.toFixed(4)} {isPositive ? '↑' : '↓'}
+            </span>
+          </div>
         </CardTitle>
+        <div className="flex gap-2">
+          <Button
+            variant={timePeriod === 'hour' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setTimePeriod('hour')}
+          >
+            Hours
+          </Button>
+          <Button
+            variant={timePeriod === 'day' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setTimePeriod('day')}
+          >
+            Days
+          </Button>
+          <Button
+            variant={timePeriod === 'month' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setTimePeriod('month')}
+          >
+            Months
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 grid grid-cols-3 gap-4 text-sm">
+          <div>
+            <span className="text-muted-foreground">RSI: </span>
+            <span className={marketFlow.rsi > 70 ? 'text-bear' : marketFlow.rsi < 30 ? 'text-bull' : ''}>
+              {marketFlow.rsi.toFixed(1)}
+            </span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Momentum: </span>
+            <span className={marketFlow.momentum > 0 ? 'text-bull' : 'text-bear'}>
+              {marketFlow.momentum.toFixed(2)}%
+            </span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Signal Strength: </span>
+            <span>{(marketFlow.strength * 100).toFixed(0)}%</span>
+          </div>
+        </div>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="time" 
@@ -60,15 +188,13 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
                 tickFormatter={(value) => value.toFixed(4)}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Line 
-                type="monotone" 
+              <Bar 
                 dataKey="price" 
-                stroke={isPositive ? "hsl(var(--bull))" : "hsl(var(--bear))"}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, stroke: "hsl(var(--primary))", strokeWidth: 2 }}
+                fill={isPositive ? "hsl(var(--bull))" : "hsl(var(--bear))"}
+                opacity={0.8}
+                radius={[2, 2, 0, 0]}
               />
-            </LineChart>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
