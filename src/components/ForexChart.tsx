@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HistoricalData } from "@/hooks/useForexData";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 interface ForexChartProps {
   data: HistoricalData[];
@@ -79,30 +79,73 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
     }
   };
 
-  const chartData = data.map((item) => ({
+  const chartData = useMemo(() => data.map((item) => ({
     time: formatTimeByPeriod(item.timestamp, timePeriod),
-    price: item.close,
+    open: item.open,
+    close: item.close,
     high: item.high,
     low: item.low,
-    volume: Math.random() * 1000000, // Mock volume data
+    candleColor: item.close >= item.open ? 'hsl(var(--bull))' : 'hsl(var(--bear))',
+    volume: Math.random() * 1000000,
     fullDate: new Date(item.timestamp).toLocaleString(),
-  }));
+  })), [data, timePeriod]);
 
-  const marketFlow = detectMarketFlow(data);
+  const marketFlow = useMemo(() => detectMarketFlow(data), [data]);
   const currentPrice = data[data.length - 1]?.close || 0;
   const previousPrice = data[data.length - 2]?.close || 0;
   const isPositive = currentPrice >= previousPrice;
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const data = payload[0].payload;
       return (
         <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
-          <p className="text-sm font-medium">{`${pair}: ${payload[0].value.toFixed(4)}`}</p>
-          <p className="text-xs text-muted-foreground">{label}</p>
+          <p className="text-xs text-muted-foreground mb-1">{label}</p>
+          <div className="space-y-1 text-xs">
+            <p className="font-medium">O: {data.open.toFixed(4)}</p>
+            <p className="font-medium">H: {data.high.toFixed(4)}</p>
+            <p className="font-medium">L: {data.low.toFixed(4)}</p>
+            <p className="font-medium">C: {data.close.toFixed(4)}</p>
+          </div>
         </div>
       );
     }
     return null;
+  };
+
+  // Candlestick bar component
+  const Candlestick = (props: any) => {
+    const { x, y, width, height, payload } = props;
+    const { open, close, high, low } = payload;
+    
+    const isPositive = close >= open;
+    const color = isPositive ? 'hsl(var(--bull))' : 'hsl(var(--bear))';
+    
+    const bodyHeight = Math.abs(close - open) * (height / (payload.high - payload.low));
+    const bodyY = y + (Math.max(high - close, high - open) * (height / (high - low)));
+    
+    return (
+      <g>
+        {/* Wick (high-low line) */}
+        <line
+          x1={x + width / 2}
+          y1={y}
+          x2={x + width / 2}
+          y2={y + height}
+          stroke={color}
+          strokeWidth={1}
+        />
+        {/* Body (open-close rectangle) */}
+        <rect
+          x={x + width * 0.2}
+          y={bodyY}
+          width={width * 0.6}
+          height={bodyHeight || 1}
+          fill={color}
+          stroke={color}
+        />
+      </g>
+    );
   };
 
   const getSignalColor = (signal: string) => {
@@ -172,7 +215,7 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
         </div>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <ComposedChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="time" 
@@ -181,7 +224,7 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
                 className="text-xs"
               />
               <YAxis 
-                domain={['dataMin - 0.001', 'dataMax + 0.001']}
+                domain={['dataMin - 0.002', 'dataMax + 0.002']}
                 axisLine={false}
                 tickLine={false}
                 className="text-xs"
@@ -189,12 +232,10 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar 
-                dataKey="price" 
-                fill={isPositive ? "hsl(var(--bull))" : "hsl(var(--bear))"}
-                opacity={0.8}
-                radius={[2, 2, 0, 0]}
+                dataKey="high"
+                shape={<Candlestick />}
               />
-            </BarChart>
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

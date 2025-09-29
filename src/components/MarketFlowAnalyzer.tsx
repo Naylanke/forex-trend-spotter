@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { HistoricalData } from "@/hooks/useForexData";
+import { useMemo } from "react";
 
 interface MarketFlowAnalyzerProps {
   data: HistoricalData[];
@@ -124,7 +125,7 @@ const analyzeMarketFlow = (data: HistoricalData[]): FlowAnalysis => {
 };
 
 export const MarketFlowAnalyzer = ({ data, pair }: MarketFlowAnalyzerProps) => {
-  const analysis = analyzeMarketFlow(data);
+  const analysis = useMemo(() => analyzeMarketFlow(data), [data]);
   
   const getSignalIcon = (signal: string) => {
     switch (signal) {

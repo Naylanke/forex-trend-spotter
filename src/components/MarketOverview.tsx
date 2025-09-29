@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp } from "lucide-react";
 import { ForexPair } from "@/hooks/useForexData";
 import { TrendIndicator } from "./TrendIndicator";
+import { useState } from "react";
 
 interface MarketOverviewProps {
   data: ForexPair[];
@@ -12,6 +13,7 @@ interface MarketOverviewProps {
 }
 
 export const MarketOverview = ({ data, onPairSelect }: MarketOverviewProps) => {
+  const [showAll, setShowAll] = useState(false);
   const forexPairs = data.filter(pair => pair.category === 'forex');
   const metalsPairs = data.filter(pair => pair.category === 'metals');
   const cryptoPairs = data.filter(pair => pair.category === 'crypto');
@@ -64,7 +66,7 @@ export const MarketOverview = ({ data, onPairSelect }: MarketOverviewProps) => {
           </TabsList>
           
           <TabsContent value="forex" className="mt-4">
-            <PairList pairs={forexPairs.slice(0, 6)} />
+            <PairList pairs={showAll ? forexPairs : forexPairs.slice(0, 6)} />
           </TabsContent>
           
           <TabsContent value="metals" className="mt-4">
@@ -76,13 +78,15 @@ export const MarketOverview = ({ data, onPairSelect }: MarketOverviewProps) => {
           </TabsContent>
         </Tabs>
         
-        <Button 
-          variant="outline" 
-          className="w-full mt-4"
-          onClick={() => console.log("Show more pairs")}
-        >
-          View All Markets
-        </Button>
+        {forexPairs.length > 6 && (
+          <Button 
+            variant="outline" 
+            className="w-full mt-4"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? 'Show Less' : 'View All Markets'}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
