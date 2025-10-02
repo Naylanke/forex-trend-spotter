@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { useEffect } from "react";
 import { initGA, logPageView } from "@/lib/analytics";
 import Index from "./pages/Index";
+import Landing from "./pages/Landing";
 import Download from "./pages/Download";
 import NotFound from "./pages/NotFound";
 
@@ -41,7 +42,8 @@ const App = () => (
         <BrowserRouter>
           <Analytics />
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/app" element={<Index />} />
             <Route path="/download" element={<Download />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
