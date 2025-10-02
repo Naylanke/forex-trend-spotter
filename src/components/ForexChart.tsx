@@ -121,8 +121,18 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
     const isPositive = close >= open;
     const color = isPositive ? 'hsl(var(--bull))' : 'hsl(var(--bear))';
     
-    const bodyHeight = Math.abs(close - open) * (height / (payload.high - payload.low));
-    const bodyY = y + (Math.max(high - close, high - open) * (height / (high - low)));
+    // Calculate proper positioning
+    const range = high - low;
+    const bodyHeight = Math.abs(close - open) * (height / range);
+    const bodyY = y + ((high - Math.max(open, close)) * (height / range));
+    
+    // Ensure minimum body height for visibility
+    const minBodyHeight = Math.max(bodyHeight, 2);
+    
+    // Responsive bar width - narrower on mobile
+    const barWidthRatio = width > 15 ? 0.7 : 0.85;
+    const barWidth = Math.max(width * barWidthRatio, 4);
+    const barX = x + (width - barWidth) / 2;
     
     return (
       <g>
@@ -133,16 +143,17 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
           x2={x + width / 2}
           y2={y + height}
           stroke={color}
-          strokeWidth={1}
+          strokeWidth={Math.max(width > 10 ? 1.5 : 1, 1)}
         />
         {/* Body (open-close rectangle) */}
         <rect
-          x={x + width * 0.2}
+          x={barX}
           y={bodyY}
-          width={width * 0.6}
-          height={bodyHeight || 1}
+          width={barWidth}
+          height={minBodyHeight}
           fill={color}
           stroke={color}
+          strokeWidth={0.5}
         />
       </g>
     );
@@ -213,27 +224,34 @@ export const ForexChart = ({ data, title = "Price Chart", pair = "EUR/USD" }: Fo
             <span>{(marketFlow.strength * 100).toFixed(0)}%</span>
           </div>
         </div>
-        <div className="h-[300px] w-full">
+        <div className="h-[300px] md:h-[350px] w-full overflow-hidden">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData}>
+            <ComposedChart 
+              data={chartData}
+              margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="time" 
                 axisLine={false}
                 tickLine={false}
                 className="text-xs"
+                interval="preserveStartEnd"
+                minTickGap={30}
               />
               <YAxis 
-                domain={['dataMin - 0.002', 'dataMax + 0.002']}
+                domain={[(dataMin: number) => dataMin * 0.9995, (dataMax: number) => dataMax * 1.0005]}
                 axisLine={false}
                 tickLine={false}
                 className="text-xs"
                 tickFormatter={(value) => value.toFixed(4)}
+                width={60}
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar 
                 dataKey="high"
                 shape={<Candlestick />}
+                maxBarSize={40}
               />
             </ComposedChart>
           </ResponsiveContainer>
