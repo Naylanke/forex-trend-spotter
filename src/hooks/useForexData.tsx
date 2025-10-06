@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+export type TradingSession = 'asian' | 'european' | 'london' | 'newyork';
+
 export interface ForexPair {
   pair: string;
   price: number;
@@ -21,8 +23,37 @@ export interface HistoricalData {
   close: number;
 }
 
+// Session-specific volatility multipliers and active pairs
+const sessionConfigs: Record<TradingSession, { 
+  volatilityMultiplier: number; 
+  activePairs: string[];
+  volumeMultiplier: number;
+}> = {
+  asian: {
+    volatilityMultiplier: 0.7, // Lower volatility
+    activePairs: ['USD/JPY', 'AUD/USD', 'NZD/USD', 'XAU/USD'],
+    volumeMultiplier: 0.6,
+  },
+  european: {
+    volatilityMultiplier: 1.3, // Higher volatility
+    activePairs: ['EUR/USD', 'GBP/USD', 'EUR/GBP', 'USD/CHF'],
+    volumeMultiplier: 1.2,
+  },
+  london: {
+    volatilityMultiplier: 1.5, // Highest volatility
+    activePairs: ['GBP/USD', 'EUR/USD', 'EUR/GBP', 'XAU/USD'],
+    volumeMultiplier: 1.5,
+  },
+  newyork: {
+    volatilityMultiplier: 1.2, // High volatility
+    activePairs: ['EUR/USD', 'GBP/USD', 'USD/CAD', 'BTC/USD', 'ETH/USD'],
+    volumeMultiplier: 1.3,
+  },
+};
+
 // Mock forex data for demonstration - in production, use a real forex API
-const generateMockData = (): ForexPair[] => {
+const generateMockData = (session: TradingSession = 'european'): ForexPair[] => {
+  const sessionConfig = sessionConfigs[session];
   const pairs = [
     { pair: 'EUR/USD', basePrice: 1.0850, category: 'forex' as const },
     { pair: 'GBP/USD', basePrice: 1.2640, category: 'forex' as const },
@@ -39,7 +70,14 @@ const generateMockData = (): ForexPair[] => {
   ];
 
   return pairs.map(({ pair, basePrice, category }) => {
-    const changeMultiplier = category === 'crypto' ? 0.05 : category === 'metals' ? 0.02 : 0.01;
+    // Check if this pair is active in current session
+    const isActivePair = sessionConfig.activePairs.includes(pair);
+    
+    // Apply session-specific volatility
+    const baseChangeMultiplier = category === 'crypto' ? 0.05 : category === 'metals' ? 0.02 : 0.01;
+    const sessionMultiplier = isActivePair ? sessionConfig.volatilityMultiplier : 0.5;
+    const changeMultiplier = baseChangeMultiplier * sessionMultiplier;
+    
     const change = (Math.random() - 0.5) * changeMultiplier;
     const price = basePrice + change;
     const changePercent = (change / basePrice) * 100;
@@ -52,22 +90,28 @@ const generateMockData = (): ForexPair[] => {
     
     const decimals = category === 'crypto' ? 2 : category === 'metals' ? 2 : 4;
     
+    // Session-based volume
+    const baseVolume = Math.floor(Math.random() * 1000000) + 100000;
+    const volume = Math.floor(baseVolume * (isActivePair ? sessionConfig.volumeMultiplier : 0.4));
+    
     return {
       pair,
       price: Number(price.toFixed(decimals)),
       change: Number(change.toFixed(decimals)),
       changePercent: Number(changePercent.toFixed(2)),
-      high: Number((price + Math.random() * 0.005).toFixed(decimals)),
-      low: Number((price - Math.random() * 0.005).toFixed(decimals)),
+      high: Number((price + Math.random() * 0.005 * sessionMultiplier).toFixed(decimals)),
+      low: Number((price - Math.random() * 0.005 * sessionMultiplier).toFixed(decimals)),
       timestamp: Date.now(),
       trend,
-      volume: Math.floor(Math.random() * 1000000) + 100000,
+      volume,
       category,
     };
   });
 };
 
-const generateHistoricalData = (pair: string = "EUR/USD", days: number = 30): HistoricalData[] => {
+const generateHistoricalData = (pair: string = "EUR/USD", days: number = 30, session: TradingSession = 'european'): HistoricalData[] => {
+  const sessionConfig = sessionConfigs[session];
+  const isActivePair = sessionConfig.activePairs.includes(pair);
   const data: HistoricalData[] = [];
   
   // Get base price for the selected pair
@@ -89,13 +133,16 @@ const generateHistoricalData = (pair: string = "EUR/USD", days: number = 30): Hi
   const config = pairConfigs[pair] || pairConfigs['EUR/USD'];
   let currentPrice = config.basePrice;
   
+  // Apply session-specific volatility to historical data
+  const sessionVolatilityMultiplier = isActivePair ? sessionConfig.volatilityMultiplier : 0.6;
+  
   for (let i = days; i >= 0; i--) {
     const timestamp = Date.now() - (i * 24 * 60 * 60 * 1000);
     const open = currentPrice;
-    const change = (Math.random() - 0.5) * config.volatility * 2;
+    const change = (Math.random() - 0.5) * config.volatility * 2 * sessionVolatilityMultiplier;
     const close = open + change;
-    const high = Math.max(open, close) + Math.random() * config.volatility;
-    const low = Math.min(open, close) - Math.random() * config.volatility;
+    const high = Math.max(open, close) + Math.random() * config.volatility * sessionVolatilityMultiplier;
+    const low = Math.min(open, close) - Math.random() * config.volatility * sessionVolatilityMultiplier;
     
     data.push({
       timestamp,
@@ -111,20 +158,20 @@ const generateHistoricalData = (pair: string = "EUR/USD", days: number = 30): Hi
   return data;
 };
 
-export const useForexData = (selectedPair?: string) => {
+export const useForexData = (selectedPair?: string, tradingSession: TradingSession = 'european') => {
   const [data, setData] = useState<ForexPair[]>([]);
   const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Initial data load
-    setData(generateMockData());
-    setHistoricalData(generateHistoricalData(selectedPair));
+    setData(generateMockData(tradingSession));
+    setHistoricalData(generateHistoricalData(selectedPair, 30, tradingSession));
     setLoading(false);
 
     // Update data every 1 second for live MT5-style market updates
     const interval = setInterval(() => {
-      const newData = generateMockData();
+      const newData = generateMockData(tradingSession);
       setData(newData);
       
       // Update historical data with live price - update the last candle
@@ -151,14 +198,14 @@ export const useForexData = (selectedPair?: string) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [selectedPair]);
+  }, [selectedPair, tradingSession]);
 
-  // Update historical data when selected pair changes
+  // Update historical data when selected pair or trading session changes
   useEffect(() => {
     if (selectedPair) {
-      setHistoricalData(generateHistoricalData(selectedPair));
+      setHistoricalData(generateHistoricalData(selectedPair, 30, tradingSession));
     }
-  }, [selectedPair]);
+  }, [selectedPair, tradingSession]);
 
   return { data, historicalData, loading };
 };

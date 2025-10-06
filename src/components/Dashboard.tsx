@@ -5,12 +5,14 @@ import { MarketOverview } from "./MarketOverview";
 import { ForexChart } from "./ForexChart";
 import { MarketFlowAnalyzer } from "./MarketFlowAnalyzer";
 import { Watchlist } from "./Watchlist";
+import { TradingSessionSelector, type TradingSession } from "./TradingSessionSelector";
 import { useForexData } from "@/hooks/useForexData";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Dashboard = () => {
   const [selectedPair, setSelectedPair] = useState("EUR/USD");
-  const { data: forexData, historicalData, loading } = useForexData(selectedPair);
+  const [tradingSession, setTradingSession] = useState<TradingSession>("european");
+  const { data: forexData, historicalData, loading } = useForexData(selectedPair, tradingSession);
   const [currentPage, setCurrentPage] = useState("dashboard");
 
   const handleNavigation = (page: string) => {
@@ -64,6 +66,12 @@ export const Dashboard = () => {
             Real-time forex market analysis and insights
           </p>
         </div>
+
+        {/* Trading Session Selector */}
+        <TradingSessionSelector 
+          selectedSession={tradingSession}
+          onSessionChange={setTradingSession}
+        />
 
         {/* Main Charts and Overview */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
