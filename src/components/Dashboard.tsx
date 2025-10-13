@@ -6,6 +6,8 @@ import { ForexChart } from "./ForexChart";
 import { MarketFlowAnalyzer } from "./MarketFlowAnalyzer";
 import { Watchlist } from "./Watchlist";
 import { TradingSessionSelector, type TradingSession } from "./TradingSessionSelector";
+import { MarketStatus } from "./MarketStatus";
+import { OfflineDetector } from "./OfflineDetector";
 import { useForexData } from "@/hooks/useForexData";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -56,6 +58,7 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <OfflineDetector />
       <Header onNavigate={handleNavigation} />
       
       <main className="container mx-auto p-6 space-y-6">
@@ -105,6 +108,9 @@ export const Dashboard = () => {
           </div>
           
           <div className="space-y-6">
+            {/* Market Status */}
+            <MarketStatus />
+            
             {/* Market Summary Card */}
             <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
               <div className="p-6">

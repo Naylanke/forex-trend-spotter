@@ -35,7 +35,7 @@ export const useAuth = () => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/app`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -47,6 +47,12 @@ export const useAuth = () => {
         }
       }
     });
+    
+    if (!error) {
+      // Email verification is automatically sent by Supabase
+      // User will receive an email to verify their account
+    }
+    
     return { error };
   };
 

@@ -247,7 +247,9 @@ export const AuthPage = () => {
 
                   {success && (
                     <Alert>
-                      <AlertDescription>{success}</AlertDescription>
+                      <AlertDescription>
+                        Account created successfully! Please check your email to verify your account before signing in.
+                      </AlertDescription>
                     </Alert>
                   )}
 

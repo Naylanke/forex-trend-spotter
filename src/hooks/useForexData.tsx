@@ -169,8 +169,14 @@ export const useForexData = (selectedPair?: string, tradingSession: TradingSessi
     setHistoricalData(generateHistoricalData(selectedPair, 30, tradingSession));
     setLoading(false);
 
+    // Check if online before starting interval
+    if (!navigator.onLine) return;
+
     // Update data every 1 second for live MT5-style market updates
     const interval = setInterval(() => {
+      // Stop updates if offline
+      if (!navigator.onLine) return;
+
       const newData = generateMockData(tradingSession);
       setData(newData);
       

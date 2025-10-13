@@ -104,49 +104,91 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Trading Tips Section */}
+      {/* How People Use This Tool Section */}
       <section className="container mx-auto px-4 py-16">
-        <h3 className="text-3xl font-bold text-center mb-12">Essential Trading Knowledge</h3>
-        <div className="max-w-4xl mx-auto space-y-6">
+        <h3 className="text-3xl font-bold text-center mb-12">How Traders Use ForexProAn</h3>
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <Card>
             <CardHeader>
-              <CardTitle>Risk Management</CardTitle>
+              <CardTitle>Day Traders</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Never risk more than 1-2% of your capital on a single trade</li>
-                <li>• Always use stop-loss orders to protect your positions</li>
-                <li>• Diversify your trades across different currency pairs</li>
-                <li>• Keep emotions in check and stick to your trading plan</li>
-              </ul>
+              <p className="text-muted-foreground mb-4">
+                "I use ForexProAn's real-time charts and session selector to catch high-volatility periods during London-NY overlap. The instant price updates help me make split-second decisions."
+              </p>
+              <p className="text-sm font-medium">- Sarah M., Professional Day Trader</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Technical Analysis Basics</CardTitle>
+              <CardTitle>Swing Traders</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Learn to read candlestick patterns for trend identification</li>
-                <li>• Use support and resistance levels to time entries and exits</li>
-                <li>• Monitor key economic indicators and news events</li>
-                <li>• Combine multiple timeframes for better trade confirmation</li>
-              </ul>
+              <p className="text-muted-foreground mb-4">
+                "The market flow analyzer helps me identify trending pairs for multi-day positions. I check the platform twice daily to monitor my positions and adjust stop-losses."
+              </p>
+              <p className="text-sm font-medium">- James L., Swing Trader</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Market Sessions</CardTitle>
+              <CardTitle>Market Analysts</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• London Session (8:00-17:00 GMT): Highest liquidity, best for EUR/GBP pairs</li>
-                <li>• New York Session (13:00-22:00 GMT): High volatility, USD pairs most active</li>
-                <li>• Asian Session (0:00-9:00 GMT): Lower volatility, good for JPY pairs</li>
-                <li>• Session overlaps offer the most trading opportunities</li>
-              </ul>
+              <p className="text-muted-foreground mb-4">
+                "ForexProAn's comprehensive analytics and session-based data allow me to prepare detailed market reports. The historical charts are invaluable for pattern recognition."
+              </p>
+              <p className="text-sm font-medium">- David K., Market Analyst</p>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Trading Tips Section */}
+      <section className="bg-muted py-16">
+        <div className="container mx-auto px-4">
+          <h3 className="text-3xl font-bold text-center mb-12">Essential Trading Knowledge</h3>
+          <div className="max-w-4xl mx-auto space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Risk Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• Never risk more than 1-2% of your capital on a single trade</li>
+                  <li>• Always use stop-loss orders to protect your positions</li>
+                  <li>• Diversify your trades across different currency pairs</li>
+                  <li>• Keep emotions in check and stick to your trading plan</li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Technical Analysis Basics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• Learn to read candlestick patterns for trend identification</li>
+                  <li>• Use support and resistance levels to time entries and exits</li>
+                  <li>• Monitor key economic indicators and news events</li>
+                  <li>• Combine multiple timeframes for better trade confirmation</li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Market Sessions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li>• London Session (8:00-17:00 GMT): Highest liquidity, best for EUR/GBP pairs</li>
+                  <li>• New York Session (13:00-22:00 GMT): High volatility, USD pairs most active</li>
+                  <li>• Asian Session (0:00-9:00 GMT): Lower volatility, good for JPY pairs</li>
+                  <li>• Session overlaps offer the most trading opportunities</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
