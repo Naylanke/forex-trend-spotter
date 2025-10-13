@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 import Download from "./pages/Download";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import { AuthPage } from "./components/AuthPage";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => (
           <Analytics />
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/app" element={<Index />} />
             <Route path="/download" element={<Download />} />
             <Route path="/reset-password" element={<ResetPassword />} />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { TrendingUp, Mail, Lock, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const AuthPage = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,15 @@ export const AuthPage = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("signin");
   
-  const { signIn, signUp, resetPassword } = useAuth();
+  const { signIn, signUp, resetPassword, user } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect authenticated users to app
+  useEffect(() => {
+    if (user) {
+      navigate("/app");
+    }
+  }, [user, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,9 +45,10 @@ export const AuthPage = () => {
     
     if (error) {
       setError(error.message);
+      setLoading(false);
+    } else {
+      // Navigation will happen via useEffect when user state updates
     }
-    
-    setLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {

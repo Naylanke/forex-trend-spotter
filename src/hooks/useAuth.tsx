@@ -35,13 +35,10 @@ export const useAuth = () => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/app`;
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName
         }
@@ -70,11 +67,7 @@ export const useAuth = () => {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/reset-password`;
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
     return { error };
   };
 

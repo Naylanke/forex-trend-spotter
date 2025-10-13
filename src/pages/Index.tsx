@@ -1,10 +1,18 @@
 import { useAuth } from "@/hooks/useAuth";
-import { AuthPage } from "@/components/AuthPage";
 import { Dashboard } from "@/components/Dashboard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -22,10 +30,6 @@ const Index = () => {
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    return <AuthPage />;
   }
 
   return <Dashboard />;

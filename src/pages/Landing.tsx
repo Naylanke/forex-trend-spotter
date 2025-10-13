@@ -13,7 +13,7 @@ const Landing = () => {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary">ForexProAn</h1>
-          <Button onClick={() => navigate("/app")} variant="default">
+          <Button onClick={() => navigate("/auth")} variant="default">
             Get Started
           </Button>
         </div>
@@ -28,10 +28,10 @@ const Landing = () => {
           Real-time market analysis, advanced charting, and powerful trading tools designed for serious traders.
         </p>
         <div className="flex gap-4 justify-center">
-          <Button size="lg" onClick={() => navigate("/app")}>
+          <Button size="lg" onClick={() => navigate("/auth")}>
             Start Trading Now
           </Button>
-          <Button size="lg" variant="outline" onClick={() => navigate("/app")}>
+          <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
             Sign In
           </Button>
         </div>
@@ -200,7 +200,7 @@ const Landing = () => {
           <p className="text-lg mb-8 opacity-90">
             Start your forex trading journey today with ForexProAn's powerful platform
           </p>
-          <Button size="lg" variant="secondary" onClick={() => navigate("/app")}>
+          <Button size="lg" variant="secondary" onClick={() => navigate("/auth")}>
             Create Free Account
           </Button>
         </div>
