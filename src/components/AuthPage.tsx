@@ -60,7 +60,12 @@ export const AuthPage = () => {
     const { error } = await signUp(email, password, fullName);
     
     if (error) {
-      setError(error.message);
+      // Check if user already exists
+      if (error.message.includes("already registered") || error.message.includes("already been registered")) {
+        setError("This email is already registered. Please sign in or reset your password if you've forgotten it.");
+      } else {
+        setError(error.message);
+      }
     } else {
       setSuccess("Account created successfully! Please check your email to verify your account.");
     }
