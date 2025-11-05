@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 import Download from "./pages/Download";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import Contact from "./pages/Contact";
 import { AuthPage } from "./components/AuthPage";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/app" element={<Index />} />
             <Route path="/download" element={<Download />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

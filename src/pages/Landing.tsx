@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Shield, Zap, BarChart3, Clock, Users } from "lucide-react";
+import { TrendingUp, Shield, Zap, BarChart3, Clock, Users, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CookieConsent } from "@/components/CookieConsent";
+import heroImage from "@/assets/hero-forex-dashboard.jpg";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -12,28 +13,48 @@ const Landing = () => {
       {/* Hero Section */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">ForexProAn</h1>
-          <Button onClick={() => navigate("/auth")} variant="default">
-            Get Started
-          </Button>
+          <h1 className="text-2xl font-bold text-primary">forexproan</h1>
+          <nav className="flex gap-4 items-center">
+            <Button onClick={() => navigate("/contact")} variant="ghost">
+              <Mail className="w-4 h-4 mr-2" />
+              Contact
+            </Button>
+            <Button onClick={() => navigate("/auth")} variant="default">
+              Get Started
+            </Button>
+          </nav>
         </div>
       </header>
 
-      {/* Hero Content */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
-          Professional Forex Trading Platform
-        </h2>
-        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Real-time market analysis, advanced charting, and powerful trading tools designed for serious traders.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Button size="lg" onClick={() => navigate("/auth")}>
-            Start Trading Now
-          </Button>
-          <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
-            Sign In
-          </Button>
+      {/* Hero Content with Image */}
+      <section className="relative">
+        <div className="relative h-[600px] overflow-hidden">
+          <img 
+            src={heroImage} 
+            alt="AI-powered forex trading dashboard with live candlestick charts showing EUR/USD and GBP/USD currency pairs with real-time market indicators"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
+        </div>
+        <div className="absolute inset-0 flex items-center">
+          <div className="container mx-auto px-4">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-chart-1 bg-clip-text text-transparent">
+                Real-Time AI Forex Market Analysis
+              </h2>
+              <p className="text-xl text-foreground mb-8">
+                Advanced AI-powered platform with real-time market data, live charts, and intelligent trading signals designed for professional traders.
+              </p>
+              <div className="flex gap-4">
+                <Button size="lg" onClick={() => navigate("/auth")}>
+                  Start Trading Now
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
+                  Sign In
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -208,11 +229,19 @@ const Landing = () => {
 
       {/* Footer */}
       <footer className="border-t py-8">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2025 ForexProAn. All rights reserved.</p>
-          <p className="text-sm mt-2">
-            Trading forex carries a high level of risk and may not be suitable for all investors.
-          </p>
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-center md:text-left text-muted-foreground">
+              <p>&copy; 2025 forexproan. All rights reserved.</p>
+              <p className="text-sm mt-2">
+                Trading forex carries a high level of risk and may not be suitable for all investors.
+              </p>
+            </div>
+            <Button onClick={() => navigate("/contact")} variant="outline">
+              <Mail className="w-4 h-4 mr-2" />
+              Contact Us
+            </Button>
+          </div>
         </div>
       </footer>
 
