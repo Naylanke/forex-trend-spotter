@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export type TradingSession = 'asian' | 'european' | 'london' | 'newyork';
 
@@ -163,21 +164,49 @@ export const useForexData = (selectedPair?: string, tradingSession: TradingSessi
   const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchRealTimeData = async () => {
+    try {
+      const { data: fetchedData, error } = await supabase.functions.invoke('fetch-forex-data');
+      
+      if (error) {
+        console.error('Error fetching forex data:', error);
+        // Fallback to mock data if API fails
+        return generateMockData(tradingSession);
+      }
+
+      if (fetchedData && fetchedData.data) {
+        return fetchedData.data;
+      }
+
+      // Fallback to mock data if no data returned
+      return generateMockData(tradingSession);
+    } catch (error) {
+      console.error('Error calling edge function:', error);
+      // Fallback to mock data if edge function fails
+      return generateMockData(tradingSession);
+    }
+  };
+
   useEffect(() => {
     // Initial data load
-    setData(generateMockData(tradingSession));
-    setHistoricalData(generateHistoricalData(selectedPair, 30, tradingSession));
-    setLoading(false);
+    const loadInitialData = async () => {
+      const realTimeData = await fetchRealTimeData();
+      setData(realTimeData);
+      setHistoricalData(generateHistoricalData(selectedPair, 30, tradingSession));
+      setLoading(false);
+    };
+
+    loadInitialData();
 
     // Check if online before starting interval
     if (!navigator.onLine) return;
 
-    // Update data every 1 second for live MT5-style market updates
-    const interval = setInterval(() => {
+    // Update data every 5 seconds for real-time updates
+    const interval = setInterval(async () => {
       // Stop updates if offline
       if (!navigator.onLine) return;
 
-      const newData = generateMockData(tradingSession);
+      const newData = await fetchRealTimeData();
       setData(newData);
       
       // Update historical data with live price - update the last candle
@@ -201,7 +230,7 @@ export const useForexData = (selectedPair?: string, tradingSession: TradingSessi
         
         return updatedData;
       });
-    }, 1000);
+    }, 5000); // Update every 5 seconds
 
     return () => clearInterval(interval);
   }, [selectedPair, tradingSession]);
