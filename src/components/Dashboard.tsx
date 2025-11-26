@@ -8,6 +8,7 @@ import { Watchlist } from "./Watchlist";
 import { TradingSessionSelector, type TradingSession } from "./TradingSessionSelector";
 import { MarketStatus } from "./MarketStatus";
 import { OfflineDetector } from "./OfflineDetector";
+import { PremiumGuard } from "./PremiumGuard";
 import { useForexData } from "@/hooks/useForexData";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -97,10 +98,12 @@ export const Dashboard = () => {
         {/* Market Flow Analysis */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <div>
-            <MarketFlowAnalyzer 
-              data={historicalData}
-              pair={selectedPair}
-            />
+            <PremiumGuard>
+              <MarketFlowAnalyzer 
+                data={historicalData}
+                pair={selectedPair}
+              />
+            </PremiumGuard>
           </div>
           
           <div>

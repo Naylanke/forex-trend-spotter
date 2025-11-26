@@ -19,7 +19,7 @@ interface PaymentDialogProps {
   onClose: () => void;
 }
 
-const PAYSTACK_PUBLIC_KEY = "pk_test_your_key_here"; // Replace with actual key
+const PAYSTACK_PUBLIC_KEY = "pk_test_05d4e663db9e45a87a76a81596a262f63418ee6c";
 
 export const PaymentDialog = ({ plan, open, onClose }: PaymentDialogProps) => {
   const [email, setEmail] = useState("");

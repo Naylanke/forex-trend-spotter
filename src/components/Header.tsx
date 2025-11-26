@@ -4,6 +4,7 @@ import { Moon, Sun, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { NotificationCenter } from "./NotificationCenter";
 import { AppDrawer } from "./AppDrawer";
+import { PremiumBadge } from "./PremiumBadge";
 
 interface HeaderProps {
   onNavigate?: (page: string) => void;
@@ -35,6 +36,7 @@ export const Header = ({ onNavigate }: HeaderProps) => {
           </div>
           
           <nav className="flex items-center space-x-2">
+            {user && <PremiumBadge />}
             <Button
               variant="ghost"
               size="icon"

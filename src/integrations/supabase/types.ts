@@ -71,6 +71,51 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          end_date: string
+          id: string
+          payment_reference: string
+          plan_id: string
+          plan_name: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          end_date: string
+          id?: string
+          payment_reference: string
+          plan_id: string
+          plan_name: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          end_date?: string
+          id?: string
+          payment_reference?: string
+          plan_id?: string
+          plan_name?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       watchlist: {
         Row: {
           created_at: string
@@ -97,7 +142,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_active_subscription: {
+        Args: { check_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
