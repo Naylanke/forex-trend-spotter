@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TrendingUp, Shield, Zap, BarChart3, Clock, Users, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CookieConsent } from "@/components/CookieConsent";
+import { PricingSection } from "@/components/PricingSection";
 import heroImage from "@/assets/hero-forex-dashboard.jpg";
 
 const Landing = () => {
@@ -212,6 +213,9 @@ const Landing = () => {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
 
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground py-16">

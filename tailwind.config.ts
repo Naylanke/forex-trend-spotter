@@ -64,6 +64,11 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        premium: {
+          blue: "hsl(var(--premium-blue))",
+          gold: "hsl(var(--premium-gold))",
+          glow: "hsl(var(--premium-glow))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
